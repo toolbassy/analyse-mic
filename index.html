@@ -134,9 +134,11 @@
     <div id="viewerWrap" class="viewer-wrap">
       <section class="viewer">
         <div class="controls">
-          <span id="pageInfo">Страница: 
-            <input type="number" id="pageInput" min="1" value="1"> / <span id="pageCount">-</span>
-          </span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span>Страница:</span>
+            <input type="number" id="pageInput" min="1" value="1">
+            <span>/ <span id="pageCount">-</span></span>
+          </div>
           <button id="goToPage">Перейти</button>
         </div>
         <div id="pdfContainer">
