@@ -31,6 +31,7 @@
     }
     .notice p{margin:0 0 10px}
     .notice a{color:inherit; text-decoration:none}
+
     /* === A4 контейнер === */
     .viewer-wrap{
       display:none; /* тек ?doc болса */
@@ -42,21 +43,21 @@
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       width:100%;
-      min-height:800px;
+      aspect-ratio: 1 / 1.4142;    /* A4 пропорциясы (ені : биіктік) */
       overflow:hidden;
       display:flex;
     }
     .viewer-bd{
       flex:1 1 auto;
-      width:100%; 
-      min-height:800px;
+      width:100%; height:100%;
       display:flex;
     }
     .pdf{
       width:100%;
-      min-height:800px;
+      height:100%;
       border:0;
       display:block;
+      object-fit:contain;
     }
   </style>
 </head>
@@ -65,25 +66,24 @@
     <header>
       <img src="https://oiltest.report/images/micgsm-logo-3-web-bw.png" alt="logo" style="width:100px">
     </header>
+
     <section class="notice">
       <p>Пожалуйста, удостоверьтесь, что оригинальный протокол, представленный на этом сайте, идентичен тому, что у Вас в руках.</p>
       <p>Также проверьте, что страница открылась именно в домене:
         <a href="https://oiltest.report">"https://oiltest-report.ru"</a>.
         Любой другой адрес и протокол будут считаться неоригинальными.</p>
     </section>
+
     <!-- PDF тек ?doc=... болса ғана көрінеді -->
     <div id="viewerWrap" class="viewer-wrap">
       <section class="viewer">
         <div class="viewer-bd">
-          <object id="pdfViewer" class="pdf" data="" type="application/pdf">
-            <p>Сіздің браузеріңіз PDF көрсетуді қолдамайды. 
-              <a id="downloadLink" href="" download>Файлды жүктеп алыңыз</a>
-            </p>
-          </object>
+          <embed id="pdfViewer" class="pdf" src="" type="application/pdf">
         </div>
       </section>
     </div>
   </div>
+
   <script>
     (function(){
       const PDFS = {
@@ -95,13 +95,9 @@
       const key = params.get("doc");
       const wrap = document.getElementById("viewerWrap");
       const pdf = document.getElementById("pdfViewer");
-      const downloadLink = document.getElementById("downloadLink");
-      
       if (key && PDFS[key]) {
         wrap.style.display = "flex";
-        const pdfUrl = PDFS[key];
-        pdf.data = pdfUrl;
-        downloadLink.href = pdfUrl;
+        pdf.src = PDFS[key];
       }
     })();
   </script>
