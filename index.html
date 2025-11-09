@@ -54,6 +54,14 @@
       background:#f9fafb;
       border-radius:8px;
     }
+    .controls input{
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:6px;
+      font-size:14px;
+      width:80px;
+      text-align:center;
+    }
     .controls button{
       padding:8px 16px;
       background:#111827;
@@ -105,9 +113,10 @@
     <div id="viewerWrap" class="viewer-wrap">
       <section class="viewer">
         <div class="controls">
-          <button id="prevPage">←</button>
-          <span id="pageInfo">Страница: <span id="pageNum">1</span> / <span id="pageCount">-</span></span>
-          <button id="nextPage">→</button>
+          <span id="pageInfo">Страница: 
+            <input type="number" id="pageInput" min="1" value="1"> / <span id="pageCount">-</span>
+          </span>
+          <button id="goToPage">Перейти</button>
         </div>
         <div id="pdfContainer">
           <div class="loading">Загрузка...</div>
@@ -133,14 +142,14 @@
       let pdfDoc = null;
       let currentPage = 1;
       const container = document.getElementById("pdfContainer");
-      const pageNumSpan = document.getElementById("pageNum");
+      const pageInput = document.getElementById("pageInput");
       const pageCountSpan = document.getElementById("pageCount");
-      const prevBtn = document.getElementById("prevPage");
-      const nextBtn = document.getElementById("nextPage");
+      const goToBtn = document.getElementById("goToPage");
 
       pdfjsLib.getDocument(PDFS[key]).promise.then(pdf => {
         pdfDoc = pdf;
         pageCountSpan.textContent = pdf.numPages;
+        pageInput.max = pdf.numPages;
         container.innerHTML = '';
         renderAllPages();
       }).catch(err => {
@@ -155,12 +164,16 @@
 
       function renderPage(num) {
         pdfDoc.getPage(num).then(page => {
-          const viewport = page.getViewport({scale: 1.5});
+          const scale = window.devicePixelRatio || 1;
+          const viewport = page.getViewport({scale: 2.0 * scale});
           const canvas = document.createElement('canvas');
           canvas.className = 'pdf-page';
           const context = canvas.getContext('2d');
+          
           canvas.height = viewport.height;
           canvas.width = viewport.width;
+          canvas.style.width = viewport.width / scale + 'px';
+          canvas.style.height = viewport.height / scale + 'px';
 
           const renderContext = {
             canvasContext: context,
@@ -172,19 +185,17 @@
         });
       }
 
-      prevBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-          currentPage--;
-          pageNumSpan.textContent = currentPage;
+      goToBtn.addEventListener('click', () => {
+        const pageNum = parseInt(pageInput.value);
+        if (pdfDoc && pageNum >= 1 && pageNum <= pdfDoc.numPages) {
+          currentPage = pageNum;
           scrollToPage(currentPage);
         }
       });
 
-      nextBtn.addEventListener('click', () => {
-        if (pdfDoc && currentPage < pdfDoc.numPages) {
-          currentPage++;
-          pageNumSpan.textContent = currentPage;
-          scrollToPage(currentPage);
+      pageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          goToBtn.click();
         }
       });
 
@@ -202,7 +213,7 @@
             const pageIndex = canvases.indexOf(entry.target);
             if (pageIndex !== -1) {
               currentPage = pageIndex + 1;
-              pageNumSpan.textContent = currentPage;
+              pageInput.value = currentPage;
             }
           }
         });
