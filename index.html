@@ -10,7 +10,7 @@
       --bg:#ffffff; --text:#111827; --muted:#6b7280; --accent:#0f62fe;
       --border:#e5e7eb; --panel:#ffffff; --panel-2:#f9fafb;
       --shadow:0 10px 30px rgba(15,23,42,.06); --radius:14px;
-      --vh: 1vh;
+      --vh: 1vh; /* fallback */
     }
     *{box-sizing:border-box} html,body{height:100%}
     body{
@@ -39,7 +39,7 @@
       border-radius:6px
     }
 
-    /* PDF көру аймағы */
+    /* --- PDF аймағы: секірмейтін биіктік --- */
     .viewer{
       margin-top:22px;
       background:var(--panel);
@@ -47,22 +47,37 @@
       border-radius:var(--radius);
       box-shadow:var(--shadow)
     }
+
+    /* Әдепкі (fallback) — custom --vh */
     .viewer-bd{
-      height:calc(var(--vh, 1vh) * 100 - 180px);
-      min-height:420px;
-      padding:18px;
-      overflow:hidden;
+      /* Бұл мәндер беттегі хедер/пэддингті шегеру үшін. Қажет болса 160–200px арасында реттеуге болады. */
+      height: calc(var(--vh, 1vh) * 100 - 180px);
+      min-height: 320px;
+      padding: 18px;
+      overflow: hidden;
     }
-    @supports (height: 100dvh) {
-      .viewer-bd{ height:calc(100dvh - 180px); }
-    }
-    @media (max-width: 820px){
+
+    /* 1) Ең тұрақтысы: 100svh қолдаса, соны қолданамыз (адрес жолағы өзгерсе де секірмейді) */
+    @supports (height: 100svh) {
       .viewer-bd{
-        height:calc(var(--vh, 1vh) * 100 - 140px);
-        min-height:60vh;
-        padding-bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+        height: calc(100svh - 180px);
       }
     }
+
+    /* 2) Әйтпесе 100dvh (динамикалық) */
+    @supports (height: 100dvh) {
+      .viewer-bd{
+        height: calc(100dvh - 180px);
+      }
+    }
+
+    /* Қауіпсіз аймаққа сәл орын қалдырамыз (iPhone тілігі т.б.) */
+    @media (max-width: 820px){
+      .viewer-bd{
+        padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      }
+    }
+
     .viewer-bd .pdf{
       width:100%;
       height:100%;
@@ -84,7 +99,7 @@
       <p>Также проверьте, что страница открылась именно в домене: <a href="https://oiltest.report" style="text-decoration:none;color:var(--text)">"https://oiltest-report.ru"</a>. Любой другой адрес и протокол будут считаться неоригинальными.</p>
     </section>
 
-    <!-- Viewer тек doc параметрі бар болса ғана көрсетіледі -->
+    <!-- Тек ?doc=.. болғанда ғана көрінеді -->
     <section id="viewerSection" class="viewer" style="display:none;">
       <div class="viewer-bd">
         <embed id="pdfViewer" class="pdf" src="" type="application/pdf">
@@ -92,21 +107,29 @@
     </section>
   </div>
 
+  <!-- Fallback --vh: тек жүктелгенде және бағдар ауысқанда ғана! -->
   <script>
-    // Мобиль биіктігін нақты анықтау
     (function () {
-      function setVh() {
-        var vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', vh + 'px');
+      function setVhOnce() {
+        try {
+          var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+          var vh = h * 0.01;
+          document.documentElement.style.setProperty('--vh', vh + 'px');
+        } catch (e) {}
       }
-      setVh();
-      window.addEventListener('resize', setVh, { passive: true });
-      window.addEventListener('orientationchange', () => setTimeout(setVh, 350), { passive: true });
+      // Жүктелгенде
+      setVhOnce();
+      // Бағдар ауысқанда (iOS-та өлшем кеш келеді — аздап кідіріс)
+      window.addEventListener('orientationchange', function(){
+        setTimeout(setVhOnce, 350);
+      }, { passive: true });
+
+      // Назар аудар: resize тыңдамаймыз, сондықтан скроллда биіктік секірмейді.
     })();
   </script>
 
   <script>
-    // PDF көрсету логикасы
+    // PDF көрсету логикасы (алдыңғыдай)
     (function () {
       const PDFS = {
         "47": { src: "ГПА-1.pdf", label: "ГПА-1.pdf" },
