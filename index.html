@@ -48,18 +48,19 @@
       display:flex;
       justify-content:center;
       align-items:center;
-      gap:15px;
+      gap:10px;
       margin-bottom:15px;
       padding:10px;
       background:#f9fafb;
       border-radius:8px;
+      flex-wrap:wrap;
     }
     .controls input{
       padding:8px 12px;
       border:1px solid var(--border);
       border-radius:6px;
       font-size:14px;
-      width:80px;
+      width:60px;
       text-align:center;
     }
     .controls button{
@@ -70,6 +71,7 @@
       border-radius:6px;
       cursor:pointer;
       font-size:14px;
+      white-space:nowrap;
     }
     .controls button:hover{
       background:#374151;
@@ -80,6 +82,25 @@
     }
     .controls span{
       font-weight:500;
+      font-size:14px;
+    }
+    @media (max-width: 480px) {
+      .controls{
+        gap:8px;
+        padding:8px;
+      }
+      .controls input{
+        width:50px;
+        padding:6px 8px;
+        font-size:13px;
+      }
+      .controls button{
+        padding:6px 12px;
+        font-size:13px;
+      }
+      .controls span{
+        font-size:13px;
+      }
     }
     #pdfContainer{
       width:100%;
