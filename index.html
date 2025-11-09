@@ -106,11 +106,11 @@
       <section class="viewer">
         <div class="controls">
           <button id="prevPage">←</button>
-          <span id="pageInfo">Бет: <span id="pageNum">1</span> / <span id="pageCount">-</span></span>
+          <span id="pageInfo">Страница: <span id="pageNum">1</span> / <span id="pageCount">-</span></span>
           <button id="nextPage">→</button>
         </div>
         <div id="pdfContainer">
-          <div class="loading">Жүктелуде...</div>
+          <div class="loading">Загрузка...</div>
         </div>
       </section>
     </div>
@@ -144,7 +144,7 @@
         container.innerHTML = '';
         renderAllPages();
       }).catch(err => {
-        container.innerHTML = '<p style="color:red">PDF жүктелмеді: ' + err.message + '</p>';
+        container.innerHTML = '<p style="color:red">Ошибка загрузки PDF: ' + err.message + '</p>';
       });
 
       function renderAllPages() {
