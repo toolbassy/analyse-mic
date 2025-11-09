@@ -165,7 +165,7 @@
       function renderPage(num) {
         pdfDoc.getPage(num).then(page => {
           const scale = window.devicePixelRatio || 1;
-          const viewport = page.getViewport({scale: 2.0});
+          const viewport = page.getViewport({scale: 1.5});
           const canvas = document.createElement('canvas');
           canvas.className = 'pdf-page';
           const context = canvas.getContext('2d');
