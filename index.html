@@ -7,144 +7,97 @@
   <title>Minerclient</title>
   <style>
     :root{
-      --bg:#ffffff; --text:#111827; --muted:#6b7280; --accent:#0f62fe;
-      --border:#e5e7eb; --panel:#ffffff; --panel-2:#f9fafb;
+      --bg:#ffffff; --text:#111827; --muted:#6b7280;
+      --border:#e5e7eb; --panel:#ffffff;
       --shadow:0 10px 30px rgba(15,23,42,.06); --radius:14px;
-      --vh: 1vh; /* fallback */
     }
-    *{box-sizing:border-box} html,body{height:100%}
+    html, body { height:100%; margin:0; padding:0; }
     body{
-      margin:0;
       font:15px/1.65 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans";
-      color:var(--text);
-      background:var(--bg)
+      color:var(--text); background:var(--bg);
+      display:flex; justify-content:center; align-items:flex-start;
     }
-    .container{max-width:1080px; margin:28px auto 40px; padding:0 20px}
+    .container{
+      width:100%;
+      max-width:1080px;
+      padding:20px;
+      box-sizing:border-box;
+    }
     header{display:flex;align-items:center;gap:14px;margin-bottom:12px}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
-    h1{font-size:20px;margin:0}
     .notice{
+      background:var(--panel); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:18px; margin-bottom:18px;
+    }
+    .notice p{margin:0 0 10px}
+    .notice a{color:inherit; text-decoration:none}
+
+    /* === A4 контейнер === */
+    .viewer-wrap{
+      display:none; /* тек ?doc болса */
+      justify-content:center;
+    }
+    .viewer{
       background:var(--panel);
       border:1px solid var(--border);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:18px
+      width:100%;
+      aspect-ratio: 1 / 1.4142;    /* A4 пропорциясы (ені : биіктік) */
+      overflow:hidden;
+      display:flex;
     }
-    .notice p{margin:0 0 10px}
-    .notice code{
-      background:#eef2ff;
-      border:1px solid #dbe2ff;
-      color:#1e3a8a;
-      padding:2px 6px;
-      border-radius:6px
-    }
-
-    /* --- PDF аймағы: секірмейтін биіктік --- */
-    .viewer{
-      margin-top:22px;
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow)
-    }
-
-    /* Әдепкі (fallback) — custom --vh */
     .viewer-bd{
-      /* Бұл мәндер беттегі хедер/пэддингті шегеру үшін. Қажет болса 160–200px арасында реттеуге болады. */
-      height: calc(var(--vh, 1vh) * 100 - 180px);
-      min-height: 320px;
-      padding: 18px;
-      overflow: hidden;
+      flex:1 1 auto;
+      width:100%; height:100%;
+      display:flex;
     }
-
-    /* 1) Ең тұрақтысы: 100svh қолдаса, соны қолданамыз (адрес жолағы өзгерсе де секірмейді) */
-    @supports (height: 100svh) {
-      .viewer-bd{
-        height: calc(100svh - 180px);
-      }
-    }
-
-    /* 2) Әйтпесе 100dvh (динамикалық) */
-    @supports (height: 100dvh) {
-      .viewer-bd{
-        height: calc(100dvh - 180px);
-      }
-    }
-
-    /* Қауіпсіз аймаққа сәл орын қалдырамыз (iPhone тілігі т.б.) */
-    @media (max-width: 820px){
-      .viewer-bd{
-        padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-      }
-    }
-
-    .viewer-bd .pdf{
+    .pdf{
       width:100%;
       height:100%;
-      display:block;
       border:0;
+      display:block;
+      object-fit:contain;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="flex-shrink-0 flex items-center mr-2">
-        <img class="h-5 w-auto" src="https://oiltest.report/images/micgsm-logo-3-web-bw.png" alt="" style="width:100px">
-      </div>
+      <img src="https://oiltest.report/images/micgsm-logo-3-web-bw.png" alt="logo" style="width:100px">
     </header>
 
     <section class="notice">
       <p>Пожалуйста, удостоверьтесь, что оригинальный протокол, представленный на этом сайте, идентичен тому, что у Вас в руках.</p>
-      <p>Также проверьте, что страница открылась именно в домене: <a href="https://oiltest.report" style="text-decoration:none;color:var(--text)">"https://oiltest-report.ru"</a>. Любой другой адрес и протокол будут считаться неоригинальными.</p>
+      <p>Также проверьте, что страница открылась именно в домене:
+        <a href="https://oiltest.report">"https://oiltest-report.ru"</a>.
+        Любой другой адрес и протокол будут считаться неоригинальными.</p>
     </section>
 
-    <!-- Тек ?doc=.. болғанда ғана көрінеді -->
-    <section id="viewerSection" class="viewer" style="display:none;">
-      <div class="viewer-bd">
-        <embed id="pdfViewer" class="pdf" src="" type="application/pdf">
-      </div>
-    </section>
+    <!-- PDF тек ?doc=... болса ғана көрінеді -->
+    <div id="viewerWrap" class="viewer-wrap">
+      <section class="viewer">
+        <div class="viewer-bd">
+          <embed id="pdfViewer" class="pdf" src="" type="application/pdf">
+        </div>
+      </section>
+    </div>
   </div>
 
-  <!-- Fallback --vh: тек жүктелгенде және бағдар ауысқанда ғана! -->
   <script>
-    (function () {
-      function setVhOnce() {
-        try {
-          var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-          var vh = h * 0.01;
-          document.documentElement.style.setProperty('--vh', vh + 'px');
-        } catch (e) {}
-      }
-      // Жүктелгенде
-      setVhOnce();
-      // Бағдар ауысқанда (iOS-та өлшем кеш келеді — аздап кідіріс)
-      window.addEventListener('orientationchange', function(){
-        setTimeout(setVhOnce, 350);
-      }, { passive: true });
-
-      // Назар аудар: resize тыңдамаймыз, сондықтан скроллда биіктік секірмейді.
-    })();
-  </script>
-
-  <script>
-    // PDF көрсету логикасы (алдыңғыдай)
-    (function () {
+    (function(){
       const PDFS = {
-        "47": { src: "ГПА-1.pdf", label: "ГПА-1.pdf" },
-        "59": { src: "ГПА-2.pdf", label: "ГПА-2.pdf" },
-        "72": { src: "ГПА-3.pdf", label: "ГПА-3.pdf" }
+        "47": "ГПА-1.pdf",
+        "59": "ГПА-2.pdf",
+        "72": "ГПА-3.pdf"
       };
-
       const params = new URLSearchParams(location.search);
       const key = params.get("doc");
-      const viewerSection = document.getElementById("viewerSection");
-      const pdfViewer = document.getElementById("pdfViewer");
-
+      const wrap = document.getElementById("viewerWrap");
+      const pdf = document.getElementById("pdfViewer");
       if (key && PDFS[key]) {
-        viewerSection.style.display = "block";
-        pdfViewer.src = PDFS[key].src;
+        wrap.style.display = "flex";
+        pdf.src = PDFS[key];
       }
     })();
   </script>
