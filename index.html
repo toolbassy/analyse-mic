@@ -170,10 +170,15 @@
           canvas.className = 'pdf-page';
           const context = canvas.getContext('2d');
           
+          // Контейнер енін тексереміз
+          const containerWidth = container.offsetWidth;
+          const pageWidth = viewport.width;
+          const scaleToFit = containerWidth < pageWidth ? containerWidth / pageWidth : 1;
+          
           canvas.height = viewport.height * scale;
           canvas.width = viewport.width * scale;
-          canvas.style.width = viewport.width + 'px';
-          canvas.style.height = viewport.height + 'px';
+          canvas.style.width = (viewport.width * scaleToFit) + 'px';
+          canvas.style.height = (viewport.height * scaleToFit) + 'px';
 
           const renderContext = {
             canvasContext: context,
