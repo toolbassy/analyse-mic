@@ -157,7 +157,7 @@
     };
 
     const params = new URLSearchParams(location.search);
-    const key = params.get("doc");
+    const key = params.get("token");
     
     if (key && PDFS[key]) {
       document.getElementById("viewerWrap").style.display = "flex";
